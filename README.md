@@ -11,7 +11,7 @@ DONE:
 <br>
 -AI control
 <br>
--Player and AI padle
+-Player and AI paddle
 <br>
 -Net
 <br>
