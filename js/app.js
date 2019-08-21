@@ -16,6 +16,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let player1Score = 0;
     let player2Score = 0;
+    const winnigScore = 3;
+
+    let showWinScreen = false;
+
+
 
 
 
@@ -39,10 +44,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+    // rematch
+
+    function handleMouseClick (e){
+        if(showWinScreen){
+            player1Score = 0;
+            player2Score = 0;
+            showWinScreen = false;
+        }
+
+
+    }
+
+
+    canvas.addEventListener('click',handleMouseClick);
+
 // reset ball after miss
 
     function ballReset() {
+        if (player1Score>= winnigScore || player2Score>=winnigScore){
+            showWinScreen = true;
+        }
         ballSpeedX = -ballSpeedX;
+        // ballSpeedY = 0;
         ballX = canvas.width / 2;
         ballY = canvas.height / 2;
 
@@ -51,14 +75,17 @@ document.addEventListener("DOMContentLoaded", function () {
     function computerAI() {
         const paddle2YCenter = paddle2Y + (paddleHeight/2);
         if (paddle2YCenter < ballY-35) {
-            paddle2Y +=6;
+            paddle2Y +=7;
 
         } else if (paddle2YCenter > ballY +35 ){
-            paddle2Y -= 6;
+            paddle2Y -= 7;
         }
     }
 
     function moveAll() {
+        if (showWinScreen === true){
+            return;
+        }
         computerAI();
 
         ballX += ballSpeedX;
@@ -66,17 +93,22 @@ document.addEventListener("DOMContentLoaded", function () {
         if (ballX > canvas.width) {
             if (ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 ballSpeedX = -ballSpeedX;
+                const deltaY = ballY - (paddle2Y + paddleHeight/2);
+                ballSpeedY = deltaY *0.35
             } else{
+                player1Score ++; // must be before reset
                 ballReset();
-                player1Score ++;
             }
 
         } else if (ballX < 0) {
             if (ballY > paddleY && ballY < paddleY + paddleHeight) {
                 ballSpeedX = -ballSpeedX;
+                const deltaY = ballY - (paddleY + paddleHeight/2);
+                ballSpeedY = deltaY *0.35
             } else {
+                player2Score ++; // must be before reset
                 ballReset();
-                player2Score ++;
+
             }
         } else if (ballY < 0) {
             ballSpeedY = -ballSpeedY;
@@ -102,9 +134,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    function createNet() {
+        for (let i=10;i<canvas.height; i+=40){
+            rect(canvas.width/2-1, i, 2, 20, 'white')
+        }
+
+
+    }
+
+
     function createAll() {
+
         //black background on canvas
         rect(0, 0, canvas.width, canvas.height, 'black');
+
+        if (showWinScreen){
+            canvasContext.fillStyle = 'white';
+            if ( player1Score >= winnigScore){
+                canvasContext.fillText(`Left Player Won!`,350,200);
+            }else if (player2Score>= winnigScore){
+                canvasContext.fillText(`Right Player Won!`,350,200);
+            }
+
+            canvasContext.fillText(`Click to continue`,350,500);
+            return;
+        }
+
+        createNet();
 
         //left player paddle
         rect(0, paddleY, paddleWidth, paddleHeight, 'white');
