@@ -1,3 +1,6 @@
+body {
+    background-color: #cccccc;
+}
 #game{
     display: block;
     margin: 0 auto;
